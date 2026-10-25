@@ -1,0 +1,52 @@
+<%- include('partials/header') %>
+<h1 class="text-2xl font-bold mb-4">Produk</h1>
+<% if (user.role === 'admin') { %>
+<% if (!categories.length) { %>
+  <div class="bg-yellow-100 text-yellow-800 rounded px-4 py-3 mb-4">Buat minimal satu <a class="underline" href="/categories">kategori</a> terlebih dahulu.</div>
+<% } else { %>
+<form method="post" action="<%= editing ? '/products/' + editing.id : '/products' %>" class="bg-white rounded-lg shadow p-4 mb-6 grid md:grid-cols-6 gap-3">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <input class="border rounded px-3 py-2 md:col-span-2" name="name" placeholder="Nama produk" value="<%= editing ? editing.name : '' %>" required>
+  <select class="border rounded px-3 py-2" name="category_id" required>
+    <% categories.forEach(c => { %><option value="<%= c.id %>" <%= editing && editing.category_id === c.id ? 'selected' : '' %>><%= c.name %></option><% }) %>
+  </select>
+  <input class="border rounded px-3 py-2" type="number" min="0" name="price" placeholder="Harga" value="<%= editing ? editing.price : '' %>" required>
+  <input class="border rounded px-3 py-2" type="number" min="0" name="stock" placeholder="Stok" value="<%= editing ? editing.stock : '' %>" required>
+  <input class="border rounded px-3 py-2 md:col-span-4" name="description" placeholder="Deskripsi (opsional)" value="<%= editing ? editing.description : '' %>">
+  <div class="md:col-span-2 flex gap-2">
+    <button class="bg-brand hover:bg-brand-dark text-white rounded px-4 py-2"><%= editing ? 'Simpan' : 'Tambah' %></button>
+    <% if (editing) { %><a class="px-4 py-2 border rounded" href="/products">Batal</a><% } %>
+  </div>
+</form>
+<% } %>
+<% } %>
+<form method="get" action="/products" class="mb-3 flex gap-2">
+  <input class="border rounded px-3 py-2 flex-1" name="q" placeholder="Cari produk..." value="<%= q %>">
+  <button class="border rounded px-4 py-2 bg-white">Cari</button>
+</form>
+<div class="bg-white rounded-lg shadow overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead class="bg-brand text-white text-left"><tr><th class="p-3">Produk</th><th class="p-3">Kategori</th><th class="p-3">Harga</th><th class="p-3">Stok</th><% if (user.role === 'admin') { %><th class="p-3">Aksi</th><% } %></tr></thead>
+    <tbody class="divide-y">
+      <% if (!items.length) { %><tr><td class="p-3 text-slate-500" colspan="5">Tidak ada produk.</td></tr><% } %>
+      <% items.forEach(p => { %>
+        <tr class="hover:bg-blue-50">
+          <td class="p-3 font-medium"><%= p.name %><div class="text-xs text-slate-500"><%= p.description %></div></td>
+          <td class="p-3"><%= p.category %></td>
+          <td class="p-3 whitespace-nowrap"><%= rupiah(p.price) %></td>
+          <td class="p-3 <%= p.stock <= 5 ? 'text-red-600 font-semibold' : '' %>"><%= p.stock %></td>
+          <% if (user.role === 'admin') { %>
+          <td class="p-3 flex gap-2">
+            <a class="text-brand underline" href="/products/<%= p.id %>/edit">Edit</a>
+            <form method="post" action="/products/<%= p.id %>/delete" onsubmit="return confirm('Hapus produk ini?')">
+              <input type="hidden" name="_csrf" value="<%= csrf %>">
+              <button class="text-red-600 underline">Hapus</button>
+            </form>
+          </td>
+          <% } %>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,14 @@
+</main>
+<footer class="text-center text-xs text-slate-400 py-6">© 2026 StoreSaja · Ikon: Pngtree, PNGEgg, PNGFind</footer>
+<script>
+  // Tandai menu yang sedang dibuka
+  document.querySelectorAll('[data-nav]').forEach(function (a) {
+    var href = a.getAttribute('href'), p = location.pathname;
+    if (p === href || p.indexOf(href + '/') === 0) {
+      a.classList.add('bg-white', 'text-brand');
+      a.classList.remove('text-blue-100');
+    }
+  });
+</script>
+</body>
+</html>

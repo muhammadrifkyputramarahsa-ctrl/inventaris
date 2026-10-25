@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+<h1 class="text-2xl font-bold mb-4">Kategori</h1>
+<% if (user.role === 'admin') { %>
+<form method="post" action="<%= editing ? '/categories/' + editing.id : '/categories' %>" class="bg-white rounded-lg shadow p-4 mb-6 grid md:grid-cols-3 gap-3">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <input class="border rounded px-3 py-2" name="name" placeholder="Nama kategori" value="<%= editing ? editing.name : '' %>" required>
+  <input class="border rounded px-3 py-2" name="description" placeholder="Deskripsi" value="<%= editing ? editing.description : '' %>">
+  <div class="flex gap-2">
+    <button class="bg-brand hover:bg-brand-dark text-white rounded px-4 py-2"><%= editing ? 'Simpan' : 'Tambah' %></button>
+    <% if (editing) { %><a class="px-4 py-2 border rounded" href="/categories">Batal</a><% } %>
+  </div>
+</form>
+<% } %>
+<div class="bg-white rounded-lg shadow overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead class="bg-brand text-white text-left"><tr><th class="p-3">Nama</th><th class="p-3">Deskripsi</th><th class="p-3">Jumlah Produk</th><% if (user.role === 'admin') { %><th class="p-3">Aksi</th><% } %></tr></thead>
+    <tbody class="divide-y">
+      <% if (!items.length) { %><tr><td class="p-3 text-slate-500" colspan="4">Belum ada data.</td></tr><% } %>
+      <% items.forEach(c => { %>
+        <tr class="hover:bg-blue-50">
+          <td class="p-3 font-medium"><%= c.name %></td>
+          <td class="p-3"><%= c.description %></td>
+          <td class="p-3"><%= c.total %></td>
+          <% if (user.role === 'admin') { %>
+          <td class="p-3 flex gap-2">
+            <a class="text-brand underline" href="/categories/<%= c.id %>/edit">Edit</a>
+            <form method="post" action="/categories/<%= c.id %>/delete" onsubmit="return confirm('Hapus kategori ini?')">
+              <input type="hidden" name="_csrf" value="<%= csrf %>">
+              <button class="text-red-600 underline">Hapus</button>
+            </form>
+          </td>
+          <% } %>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<%- include('partials/footer') %>
